@@ -1,0 +1,118 @@
+#!/usr/bin/python
+
+# Huazhong University of Science and Technology 
+# 2011 AI Course Programming Exercise SDK
+
+from subprocess import Popen, PIPE, STDOUT
+import sys
+import datetime
+import os.path
+
+def translate(tile):
+    if tile == '#':
+        return False
+    elif tile == '.':
+        return True
+    else:
+        raise ValueError
+
+def readMap(mapfile):
+    f = open(mapfile, 'r')
+    H, W = [int(i) for i in f.readline().strip().split(' ')]
+    startX, startY = [int(i)-1 for i in f.readline().strip().split(' ')]
+
+    m = []
+    for i in range(H):
+        line = f.readline().strip()
+        if len(line) != W:
+            raise ValueError
+        m.append([translate(t) for t in line])
+
+    if m[startX][startY] != True:
+        raise ValueError
+
+    return m, (startX, startY)
+
+def getMapState(m, x, y):
+    if x == 0 or x == len(m)-1 or y == 0 or y == len(m[0])-1:
+        raise Exception('Unknown error. Please contact mail@xiesong.me')
+
+    return ''.join(('1' if t else '0' for t in (m[x-1][y-1], m[x-1][y], m[x-1][y+1], m[x][y+1], m[x+1][y+1], m[x+1][y], m[x+1][y-1], m[x][y-1])))
+    
+def valid(m, x, y):
+    print x, y, x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
+    return x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
+
+def runRobot(robot, m, startP):
+    debug = True
+    
+    n = 10
+    now = datetime.datetime.now()
+    robot = os.path.realpath(robot)
+    x, y = startP
+    userData = ''
+    
+    replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
+    replay.writelines(';; HUST AI Course Programming Exercise\n')
+    replay.writelines(';; Robot replay %s\n' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    replay.writelines('%d\n' % n)
+    
+    # for step in range(5 * (len(m) + len(m[0]))):
+    for step in range(n):
+        if debug:
+            # print x, y, robot, getMapState(m, x, y) + '\n' + userData
+            pass
+        p = Popen([robot], stdin=PIPE, stdout=PIPE)
+
+        try:
+            p.stdin.write(getMapState(m, x, y) + '\n' + userData)
+        except IOError:
+            pass
+        p.wait()
+        output = p.stdout.readline().strip()
+        userData = p.stdout.readline().rstrip()
+        if output == 'N':
+            newx = x - 1
+            newy = y
+        elif output == 'S':
+            newx = x + 1
+            newy = y
+        elif output == 'W':
+            newx = x
+            newy = y - 1
+        elif output == 'E':
+            newx = x
+            newy = y + 1
+        else:
+            raise ValueError
+
+        replay.write(output)
+        if valid(m, newx, newy):
+            x, y = newx, newy
+        
+    
+    replay.close()
+    
+def run(robot, mapfile):
+    try:
+        m, (startX, startY) = readMap(mapfile)
+    except IOError:
+        print 'runrobot: Error! Mapfile "%s" does not exist!' % mapfile
+    except ValueError:
+        print 'runrobot: Error! Mapfile "%s" is not a valid mapfile!' % mapfile
+
+    try:
+        runRobot(robot, m, (startX, startY))
+    except ValueError:
+        print 'runrobot: Error! Wrong output from robot.'
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print 'runrobot: use "%s robot mapfile" to run your robot' % (sys.argv[0])
+    else:
+        try:
+            run(sys.argv[1], sys.argv[2])
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            raise 
+
