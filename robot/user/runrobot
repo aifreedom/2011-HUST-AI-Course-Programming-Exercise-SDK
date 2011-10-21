@@ -2,6 +2,23 @@
 
 # Huazhong University of Science and Technology 
 # 2011 AI Course Programming Exercise SDK
+# Author: Song Xie<mail@xiesong.me>
+# Date: October 20, 2011
+#    
+# This file is part of HUST AI Course Programming Exercise SKD.
+#
+# HUST AI Course Programming Exercise SKD is free software: you can
+# redistribute it and/or modify it under the terms of the GNU General
+# Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+# HUST AI Course Programming Exercise SKD is distributed in the hope
+# that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with HUST AI Course Programming Exercise SKD. If not, see
+# <http://www.gnu.org/licenses/>.
 
 from subprocess import Popen, PIPE, STDOUT
 import sys
@@ -40,37 +57,47 @@ def getMapState(m, x, y):
     return ''.join(('1' if t else '0' for t in (m[x-1][y-1], m[x-1][y], m[x-1][y+1], m[x][y+1], m[x+1][y+1], m[x+1][y], m[x+1][y-1], m[x][y-1])))
     
 def valid(m, x, y):
-    print x, y, x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
     return x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
 
-def runRobot(robot, m, startP):
-    debug = True
+def printMap(out, m, startP):
+    out.write('%d %d\n' % (len(m), len(m[0])))
+    out.write('%d %d\n' % startP)
+    for line in m:
+        out.write(''.join(('.' if t==True else '#' for t in line)) + '\n')
     
-    n = 10
+
+def runRobot(robot, m, startP):
+    debug = False
+    
+    n = 5 * (len(m) + len(m[0]))
     now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
     userData = ''
     
     replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
-    replay.writelines(';; HUST AI Course Programming Exercise\n')
-    replay.writelines(';; Robot replay %s\n' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    replay.writelines('%d\n' % n)
+    # replay.writelines(';; HUST AI Course Programming Exercise\n')
+    # replay.writelines(';; Robot replay %s\n' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+    printMap(replay, m, startP)
+    replay.write('%d\n' % n)
     
     # for step in range(5 * (len(m) + len(m[0]))):
     for step in range(n):
         if debug:
-            # print x, y, robot, getMapState(m, x, y) + '\n' + userData
+            print x, y, robot, getMapState(m, x, y) + '\n' + userData + '\n'
             pass
+        
         p = Popen([robot], stdin=PIPE, stdout=PIPE)
-
         try:
-            p.stdin.write(getMapState(m, x, y) + '\n' + userData)
+            p.stdin.write(getMapState(m, x, y) + '\n' + userData + '\n')
+            p.stdin.flush()
         except IOError:
             pass
-        p.wait()
+        # p.wait()
         output = p.stdout.readline().strip()
         userData = p.stdout.readline().rstrip()
+        
         if output == 'N':
             newx = x - 1
             newy = y
@@ -86,7 +113,10 @@ def runRobot(robot, m, startP):
         else:
             raise ValueError
 
-        replay.write(output)
+        replay.write(output+'\n')
+        replay.write('%d\n' % len(userData))
+        replay.write(userData+'\n')
+        
         if valid(m, newx, newy):
             x, y = newx, newy
         
