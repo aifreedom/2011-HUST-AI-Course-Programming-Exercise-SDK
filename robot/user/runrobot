@@ -66,10 +66,10 @@ def printMap(out, m, startP):
         out.write(''.join(('.' if t==True else '#' for t in line)) + '\n')
     
 
-def runRobot(robot, m, startP):
+def runRobot(robot, m, startP, totalStep):
     debug = False
-    
-    n = 5 * (len(m) + len(m[0]))
+
+    totalStep = int(totalStep)
     now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
@@ -80,10 +80,10 @@ def runRobot(robot, m, startP):
     # replay.writelines(';; Robot replay %s\n' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
     printMap(replay, m, startP)
-    replay.write('%d\n' % n)
+    replay.write('%d\n' % totalStep)
     
     # for step in range(5 * (len(m) + len(m[0]))):
-    for step in range(n):
+    for step in range(totalStep):
         if debug:
             print x, y, robot, getMapState(m, x, y) + '\n' + userData + '\n'
             pass
@@ -114,7 +114,6 @@ def runRobot(robot, m, startP):
             raise ValueError
 
         replay.write(output+'\n')
-        replay.write('%d\n' % len(userData))
         replay.write(userData+'\n')
         
         if valid(m, newx, newy):
@@ -123,25 +122,36 @@ def runRobot(robot, m, startP):
     
     replay.close()
     
-def run(robot, mapfile):
+def run(robot, mapfile, step):
     try:
         m, (startX, startY) = readMap(mapfile)
     except IOError:
         print 'runrobot: Error! Mapfile "%s" does not exist!' % mapfile
+        sys.exit()
     except ValueError:
         print 'runrobot: Error! Mapfile "%s" is not a valid mapfile!' % mapfile
+        sys.exit()
 
     try:
-        runRobot(robot, m, (startX, startY))
+        totalStep = int(step)
+    except:
+        print 'runrobot: Error! "%s" is not a valid integer for step!' % step
+        sys.exit()
+
+    try:
+        runRobot(robot, m, (startX, startY), totalStep)
     except ValueError:
         print 'runrobot: Error! Wrong output from robot.'
+        sys.exit()
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print 'runrobot: use "%s robot mapfile" to run your robot' % (sys.argv[0])
+    if len(sys.argv) != 4:
+        print 'runrobot: use "%s robot mapfile step" to run your robot' % (sys.argv[0])
     else:
         try:
-            run(sys.argv[1], sys.argv[2])
+            run(sys.argv[1], sys.argv[2], sys.argv[3])
+        except SystemExit:
+            pass
         except:
             print "Unexpected error:", sys.exc_info()[0]
             raise 
