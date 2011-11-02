@@ -60,27 +60,23 @@ def valid(m, x, y):
     return x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
 
 def printMap(out, m, startP):
+    x, y = startP
     out.write('%d %d\n' % (len(m), len(m[0])))
-    out.write('%d %d\n' % startP)
+    out.write('%d %d\n' % (x+1, y+1))
     for line in m:
         out.write(''.join(('.' if t==True else '#' for t in line)) + '\n')
     
 
 def runRobot(robot, m, startP, totalStep):
     debug = False
-
+    
+    maxUserDataLen = 10000
     totalStep = int(totalStep)
     now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
     userData = ''
-    
-    replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
-    # replay.writelines(';; HUST AI Course Programming Exercise\n')
-    # replay.writelines(';; Robot replay %s\n' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
-    printMap(replay, m, startP)
-    replay.write('%d\n' % totalStep)
+    buffer = ''
     
     # for step in range(5 * (len(m) + len(m[0]))):
     for step in range(totalStep):
