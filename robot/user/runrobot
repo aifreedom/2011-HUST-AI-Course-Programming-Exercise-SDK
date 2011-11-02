@@ -84,15 +84,15 @@ def runRobot(robot, m, startP, totalStep):
             print x, y, robot, getMapState(m, x, y) + '\n' + userData + '\n'
             pass
         
-        p = Popen([robot], stdin=PIPE, stdout=PIPE)
+        p = Popen([robot], stdin=PIPE, stdout=PIPE, bufsize=1)
         try:
             p.stdin.write(getMapState(m, x, y) + '\n' + userData + '\n')
             p.stdin.flush()
         except IOError:
             pass
-        # p.wait()
+
         output = p.stdout.readline().strip()
-        userData = p.stdout.readline().rstrip()
+        userData = p.stdout.readline().rstrip()[:maxUserDataLen]
         
         if output == 'N':
             newx = x - 1
@@ -109,13 +109,17 @@ def runRobot(robot, m, startP, totalStep):
         else:
             raise ValueError
 
-        replay.write(output+'\n')
-        replay.write(userData+'\n')
+        buffer = buffer + output + '\n' + userData + '\n'
         
         if valid(m, newx, newy):
             x, y = newx, newy
-        
-    
+        else:
+            raise ValueError
+
+    replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
+    printMap(replay, m, startP)
+    replay.write('%d\n' % totalStep)
+    replay.write(buffer)
     replay.close()
     
 def run(robot, mapfile, step):
