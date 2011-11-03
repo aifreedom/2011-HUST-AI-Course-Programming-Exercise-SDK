@@ -109,12 +109,22 @@ def runRobot(robot, m, startP, totalStep):
         else:
             raise ValueError
 
-        buffer = buffer + output + '\n' + userData + '\n'
-        
         if valid(m, newx, newy):
             x, y = newx, newy
         else:
+            errorLog = open('RobotErrorLog_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
+            printMap(errorLog, m, startP)
+            errorLog.write('%d\n' % step)
+            errorLog.write(buffer)
+            errorLog.write('\nThe last step:\n')
+            errorLog.write('Pos: (%d, %d)\n' % (x+1, y+1))
+            errorLog.write(output+'\n'+userData+'\n')
+            errorLog.close()
+            
             raise ValueError
+        
+        buffer = buffer + output + '\n' + userData + '\n'
+        
 
     replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
     printMap(replay, m, startP)
