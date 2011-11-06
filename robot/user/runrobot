@@ -71,7 +71,6 @@ def runRobot(robot, m, startP, totalStep):
     debug = False
     
     maxUserDataLen = 10000
-    totalStep = int(totalStep)
     now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
@@ -105,12 +104,14 @@ def runRobot(robot, m, startP, totalStep):
             newx = x
             newy = y + 1
         else:
+            print 'runrobot: Error! "%s" is not a valid move direction.' % output
             raise ValueError
 
         if valid(m, newx, newy):
             x, y = newx, newy
         else:
-            errorLog = open('RobotErrorLog_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
+            errorLogName = 'RobotErrorLog_%s.log' % now.strftime('%Y%m%d_%H%M%S')
+            errorLog = open(errorLogName, 'w')
             printMap(errorLog, m, startP)
             errorLog.write('%d\n' % step)
             errorLog.write(''.join(stepList))
@@ -119,6 +120,7 @@ def runRobot(robot, m, startP, totalStep):
             errorLog.write(output+'\n')
             errorLog.close()
             p.kill()
+            print 'runrobot: Error! Your robot moves into an obstacle. Please check the error log %s.' % errorLogName
             raise ValueError
         
         stepList.append(output)
@@ -150,7 +152,7 @@ def run(robot, mapfile, step):
     try:
         runRobot(robot, m, (startX, startY), totalStep)
     except ValueError:
-        print 'runrobot: Error! Wrong output from robot.'
+        print 'runrobot: Wrong output from robot.'
         sys.exit()
 
 if __name__ == '__main__':
@@ -160,6 +162,7 @@ if __name__ == '__main__':
         try:
             run(sys.argv[1], sys.argv[2], sys.argv[3])
         except SystemExit:
+            print "runrobot: runrobot will now be terminated."
             pass
         except:
             print "Unexpected error:", sys.exc_info()[0]
