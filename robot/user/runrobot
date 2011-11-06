@@ -67,11 +67,13 @@ def printMap(out, m, startP):
         out.write(''.join(('.' if t==True else '#' for t in line)) + '\n')
     
 
-def runRobot(robot, m, startP, totalStep):
+def runRobot(robot, m, startP, totalStep, currentTime):
     debug = False
+
+    replayFileName = 'RobotReplay_%s.log' % currentTime
+    errorLogFileName = 'RobotErrorLog_%s.log' % currentTime
     
     maxUserDataLen = 10000
-    now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
     stepList = []
@@ -110,8 +112,7 @@ def runRobot(robot, m, startP, totalStep):
         if valid(m, newx, newy):
             x, y = newx, newy
         else:
-            errorLogName = 'RobotErrorLog_%s.log' % now.strftime('%Y%m%d_%H%M%S')
-            errorLog = open(errorLogName, 'w')
+            errorLog = open(errorLogFileName, 'w')
             printMap(errorLog, m, startP)
             errorLog.write('%d\n' % step)
             errorLog.write(''.join(stepList))
@@ -126,14 +127,17 @@ def runRobot(robot, m, startP, totalStep):
         stepList.append(output)
 
 
-    replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
+    replay = open(replayFileName, 'w')
     printMap(replay, m, startP)
     replay.write('%d\n' % totalStep)
     replay.write(''.join(stepList))
     replay.close()
     p.kill()
+    # runRobot
     
 def run(robot, mapfile, step):
+    currentTime = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    replayFileName = 'RobotReplay_%s.log' % currentTime
     try:
         m, (startX, startY) = readMap(mapfile)
     except IOError:
@@ -150,10 +154,12 @@ def run(robot, mapfile, step):
         sys.exit()
 
     try:
-        runRobot(robot, m, (startX, startY), totalStep)
+        runRobot(robot, m, (startX, startY), totalStep, currentTime)
     except ValueError:
         print 'runrobot: Wrong output from robot.'
         sys.exit()
+
+    print 'runrobot: Congratulations! The log is written to %s.' % replayFileName
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
