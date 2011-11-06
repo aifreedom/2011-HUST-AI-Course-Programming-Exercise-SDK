@@ -75,24 +75,22 @@ def runRobot(robot, m, startP, totalStep):
     now = datetime.datetime.now()
     robot = os.path.realpath(robot)
     x, y = startP
-    userData = ''
-    buffer = ''
+    stepList = []
     
-    # for step in range(5 * (len(m) + len(m[0]))):
+    p = Popen([robot], stdin=PIPE, stdout=PIPE, bufsize=1)
     for step in range(totalStep):
         if debug:
             print x, y, robot, getMapState(m, x, y) + '\n' + userData + '\n'
             pass
-        
-        p = Popen([robot], stdin=PIPE, stdout=PIPE, bufsize=1)
+
         try:
-            p.stdin.write(getMapState(m, x, y) + '\n' + userData + '\n')
+            p.stdin.write(getMapState(m, x, y) + '\n')
             p.stdin.flush()
         except IOError:
             pass
-
+        
         output = p.stdout.readline().strip()
-        userData = p.stdout.readline().rstrip()[:maxUserDataLen]
+
         
         if output == 'N':
             newx = x - 1
@@ -115,22 +113,23 @@ def runRobot(robot, m, startP, totalStep):
             errorLog = open('RobotErrorLog_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
             printMap(errorLog, m, startP)
             errorLog.write('%d\n' % step)
-            errorLog.write(buffer)
+            errorLog.write(''.join(stepList))
             errorLog.write('\nThe last step:\n')
             errorLog.write('Pos: (%d, %d)\n' % (x+1, y+1))
-            errorLog.write(output+'\n'+userData+'\n')
+            errorLog.write(output+'\n')
             errorLog.close()
-            
+            p.kill()
             raise ValueError
         
-        buffer = buffer + output + '\n' + userData + '\n'
-        
+        stepList.append(output)
+
 
     replay = open('RobotReplay_%s.log' % now.strftime('%Y%m%d_%H%M%S'), 'w')
     printMap(replay, m, startP)
     replay.write('%d\n' % totalStep)
-    replay.write(buffer)
+    replay.write(''.join(stepList))
     replay.close()
+    p.kill()
     
 def run(robot, mapfile, step):
     try:
