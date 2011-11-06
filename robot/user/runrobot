@@ -25,7 +25,7 @@ import sys
 import datetime
 import os.path
 
-def translate(tile):
+def Translate(tile):
     if tile == '#':
         return False
     elif tile == '.':
@@ -33,7 +33,7 @@ def translate(tile):
     else:
         raise ValueError
 
-def readMap(mapfile):
+def ReadMap(mapfile):
     f = open(mapfile, 'r')
     H, W = [int(i) for i in f.readline().strip().split(' ')]
     startX, startY = [int(i)-1 for i in f.readline().strip().split(' ')]
@@ -43,23 +43,23 @@ def readMap(mapfile):
         line = f.readline().strip()
         if len(line) != W:
             raise ValueError
-        m.append([translate(t) for t in line])
+        m.append([Translate(t) for t in line])
 
     if m[startX][startY] != True:
         raise ValueError
 
     return m, (startX, startY)
 
-def getMapState(m, x, y):
+def GetMapState(m, x, y):
     if x == 0 or x == len(m)-1 or y == 0 or y == len(m[0])-1:
         raise Exception('Unknown error. Please contact mail@xiesong.me')
 
     return ''.join(('1' if t else '0' for t in (m[x-1][y-1], m[x-1][y], m[x-1][y+1], m[x][y+1], m[x+1][y+1], m[x+1][y], m[x+1][y-1], m[x][y-1])))
     
-def valid(m, x, y):
+def Valid(m, x, y):
     return x >= 0 and x < len(m) and y >= 0 and y < len(m[0]) and m[x][y]
 
-def printMap(out, m, startP):
+def PrintMap(out, m, startP):
     x, y = startP
     out.write('%d %d\n' % (len(m), len(m[0])))
     out.write('%d %d\n' % (x+1, y+1))
@@ -67,7 +67,7 @@ def printMap(out, m, startP):
         out.write(''.join(('.' if t==True else '#' for t in line)) + '\n')
     
 
-def runRobot(robot, m, startP, totalStep, currentTime):
+def RunRobot(robot, m, startP, totalStep, currentTime):
     debug = False
 
     replayFileName = 'RobotReplay_%s.log' % currentTime
@@ -81,11 +81,11 @@ def runRobot(robot, m, startP, totalStep, currentTime):
     p = Popen([robot], stdin=PIPE, stdout=PIPE, bufsize=1)
     for step in range(totalStep):
         if debug:
-            print x, y, robot, getMapState(m, x, y) + '\n' + userData + '\n'
+            print x, y, robot, GetMapState(m, x, y) + '\n' + userData + '\n'
             pass
 
         try:
-            p.stdin.write(getMapState(m, x, y) + '\n')
+            p.stdin.write(GetMapState(m, x, y) + '\n')
             p.stdin.flush()
         except IOError:
             pass
@@ -109,11 +109,11 @@ def runRobot(robot, m, startP, totalStep, currentTime):
             print 'runrobot: Error! "%s" is not a valid move direction.' % output
             raise ValueError
 
-        if valid(m, newx, newy):
+        if Valid(m, newx, newy):
             x, y = newx, newy
         else:
             errorLog = open(errorLogFileName, 'w')
-            printMap(errorLog, m, startP)
+            PrintMap(errorLog, m, startP)
             errorLog.write('%d\n' % step)
             errorLog.write(''.join(stepList))
             errorLog.write('\nThe last step:\n')
@@ -128,18 +128,18 @@ def runRobot(robot, m, startP, totalStep, currentTime):
 
 
     replay = open(replayFileName, 'w')
-    printMap(replay, m, startP)
+    PrintMap(replay, m, startP)
     replay.write('%d\n' % totalStep)
     replay.write(''.join(stepList))
     replay.close()
     p.kill()
-    # runRobot
+# end of RunRobot
     
-def run(robot, mapfile, step):
+def Run(robot, mapfile, step):
     currentTime = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     replayFileName = 'RobotReplay_%s.log' % currentTime
     try:
-        m, (startX, startY) = readMap(mapfile)
+        m, (startX, startY) = ReadMap(mapfile)
     except IOError:
         print 'runrobot: Error! Mapfile "%s" does not exist!' % mapfile
         sys.exit()
@@ -149,16 +149,16 @@ def run(robot, mapfile, step):
 
     try:
         totalStep = int(step)
-    except:
+    except ValueError:
         print 'runrobot: Error! "%s" is not a valid integer for step!' % step
         sys.exit()
 
     try:
-        runRobot(robot, m, (startX, startY), totalStep, currentTime)
+        RunRobot(robot, m, (startX, startY), totalStep, currentTime)
     except ValueError:
         print 'runrobot: Wrong output from robot.'
         sys.exit()
-
+        
     print 'runrobot: Congratulations! The log is written to %s.' % replayFileName
 
 if __name__ == '__main__':
@@ -166,7 +166,7 @@ if __name__ == '__main__':
         print 'runrobot: use "%s robot mapfile step" to run your robot' % (sys.argv[0])
     else:
         try:
-            run(sys.argv[1], sys.argv[2], sys.argv[3])
+            Run(sys.argv[1], sys.argv[2], sys.argv[3])
         except SystemExit:
             print "runrobot: runrobot will now be terminated."
             pass
