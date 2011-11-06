@@ -115,7 +115,7 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
             errorLog = open(errorLogFileName, 'w')
             PrintMap(errorLog, m, startP)
             errorLog.write('%d\n' % step)
-            errorLog.write(''.join(stepList))
+            errorLog.write(''.join(stepList) + '\n')
             errorLog.write('\nThe last step:\n')
             errorLog.write('Pos: (%d, %d)\n' % (x+1, y+1))
             errorLog.write(output+'\n')
@@ -130,7 +130,7 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
     replay = open(replayFileName, 'w')
     PrintMap(replay, m, startP)
     replay.write('%d\n' % totalStep)
-    replay.write(''.join(stepList))
+    replay.write(''.join(stepList) + '\n')
     replay.close()
     p.kill()
 # end of RunRobot
