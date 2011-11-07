@@ -121,7 +121,7 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
             errorLog.write(output+'\n')
             errorLog.close()
             p.kill()
-            print 'runrobot: Error! Your robot moves into an obstacle. Please check the error log %s.' % errorLogName
+            print 'runrobot: Error! Your robot moves into an obstacle. Please check the error log %s.' % errorLogFileName
             raise ValueError
         
         stepList.append(output)
