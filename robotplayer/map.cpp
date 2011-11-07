@@ -141,7 +141,7 @@ bool Map::LoadSteps(FILE* logFile)
                // wrong format
                return false;
           }
-          GetLinefeed(logFile);
+          //GetLinefeed(logFile);
           //fgets(userData, bufSize, logFile);
           //step.UserData = userData;
           stepList.push_back(step);
