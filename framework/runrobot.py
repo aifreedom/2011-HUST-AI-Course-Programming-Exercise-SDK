@@ -45,8 +45,21 @@ def ReadMap(mapfile):
             raise ValueError
         m.append([Translate(t) for t in line])
 
-    if m[startX][startY] != True:
+    # start point is not with the board's range
+    if startX < 0 or startX >= H or startY < 0 or startY >= W:
         raise ValueError
+
+    # start point is an obstacle
+    if not m[startX][startY]:
+        raise ValueError
+
+    for i in range(H):
+        if m[i][0] or m[i][W-1]:
+            raise ValueError
+
+    for i in range(W):
+        if m[0][i] or m[H-1][i]:
+            raise ValueError
 
     return m, (startX, startY)
 
