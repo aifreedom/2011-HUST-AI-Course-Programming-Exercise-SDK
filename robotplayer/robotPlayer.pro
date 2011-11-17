@@ -1,13 +1,8 @@
-SOURCES += \
-    robotPlayerMain.cpp \
+HEADERS += map.hpp \
+    robotplayermainwindow.h \
+    mapbrowser.h
+SOURCES += map.cpp \
     robotplayermainwindow.cpp \
     mapbrowser.cpp \
-    map.cpp
-
-HEADERS += \
-    robotplayermainwindow.h \
-    mapbrowser.h \
-    map.hpp
-
-RESOURCES += \
-    images.qrc
+    robotPlayerMain.cpp
+RESOURCES += images.qrc

@@ -1,4 +1,24 @@
-ï»¿#include "robotplayermainwindow.h"
+// Huazhong University of Science and Technology
+// 2011 AI Course Programming Exercise SDK - RobotPlayer
+// Author: Jian Gong<gongjian1990@gmail.com> Song Xie<mail@xiesong.me>
+// Date: November 10, 2011
+//
+// This file is part of HUST AI Course Programming Exercise SKD.
+//
+// HUST AI Course Programming Exercise SKD is free software: you can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either
+// version 3 of the License, or (at your option) any later version.
+// HUST AI Course Programming Exercise SKD is distributed in the hope
+// that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+// PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with HUST AI Course Programming Exercise SKD. If not, see
+// <http://www.gnu.org/licenses/>.
+
+#include "robotplayermainwindow.h"
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
@@ -19,7 +39,7 @@ robotPlayerMainWindow::robotPlayerMainWindow(QWidget *parent) :
     robotMap = NULL;
     log.clear();
 
-    this->setWindowTitle(tr("RobotPlayer"));
+    this->setWindowTitle(tr("RobotPlayer - Hust 2011 AI Course Programming Exercise SDK"));
 
     mainSplitter = new QSplitter(Qt::Vertical);
 
@@ -68,17 +88,16 @@ robotPlayerMainWindow::robotPlayerMainWindow(QWidget *parent) :
     downLayout = new QHBoxLayout();
     historyLogTable = new QTableWidget();
     QStringList tabHeaders;
-    tabHeaders << tr("æ­¥") << tr("robotä½ç½®") << tr("ä¸‹ä¸€æ­¥")<<tr("ç”¨æˆ·è‡ªå®šä¹‰Log");
+    tabHeaders << tr("²½") << tr("robotÎ»ÖÃ") << tr("ÏÂÒ»²½")<<tr("ÓÃ»§×Ô¶¨ÒåLog");
     historyLogTable->setColumnCount(3);//4);
     historyLogTable->setHorizontalHeaderLabels(tabHeaders);
-    historyLogTable->setEditTriggers(QAbstractItemView::NoEditTriggers);//è¡¨æ ¼è®¾ç½®ä¸ºç¦æ­¢ç¼–è¾‘
-    historyLogTable->setSelectionBehavior(QAbstractItemView::SelectRows);//è¡¨æ ¼è®¾ç½®ä¸ºæ•´è¡Œé€‰æ‹©
-    historyLogTable->setSelectionMode(QAbstractItemView::SingleSelection);//è¡¨æ ¼è®¾ç½®ä¸ºå•é€‰ï¼ˆä¸å¯é€‰ä¸­å¤šè¡Œï¼‰
-    historyLogTable->verticalHeader()->setHidden(true);//ä¸æ˜¾ç¤ºè¡Œå·
-    historyLogTable->setColumnWidth(0, 100);//è®¾ç½®åˆ—å®½
-    historyLogTable->setColumnWidth(1, 100);//è®¾ç½®åˆ—å®½
-    historyLogTable->setColumnWidth(2, 100);//è®¾ç½®åˆ—å®½
-    //historyLogTable->setColumnWidth(3, 300);//è®¾ç½®åˆ—å®½
+    historyLogTable->setEditTriggers(QAbstractItemView::NoEditTriggers);//±í¸ñÉèÖÃÎª½ûÖ¹±à¼­
+    historyLogTable->setSelectionBehavior(QAbstractItemView::SelectRows);//±í¸ñÉèÖÃÎªÕûÐÐÑ¡Ôñ
+    historyLogTable->setSelectionMode(QAbstractItemView::SingleSelection);//±í¸ñÉèÖÃÎªµ¥Ñ¡£¨²»¿ÉÑ¡ÖÐ¶àÐÐ£©
+    historyLogTable->verticalHeader()->setHidden(true);//²»ÏÔÊ¾ÐÐºÅ
+    historyLogTable->setColumnWidth(0, 100);//ÉèÖÃÁÐ¿í
+    historyLogTable->setColumnWidth(1, 100);//ÉèÖÃÁÐ¿í
+    historyLogTable->setColumnWidth(2, 100);//ÉèÖÃÁÐ¿í
     downLayout->addWidget(historyLogTable);
     downWidget->setLayout(downLayout);
 
@@ -137,7 +156,7 @@ void robotPlayerMainWindow::openButtonClicked()
     cout<<"open button clicked" << endl;
     QString filename = QFileDialog::getOpenFileName(
                     this,
-                    tr("æ‰“å¼€æ–‡ä»¶"),
+                    tr("´ò¿ªÎÄ¼þ"),
                     "./",
                     tr("File(*.log)")
                     );
@@ -164,7 +183,7 @@ void robotPlayerMainWindow::openButtonClicked()
         robotMap = new Map(filename.toStdString());
     }
     catch(exception e){
-        QMessageBox box(QMessageBox::Warning, tr("Error"), tr("è¯»å–replayæ–‡ä»¶å‡ºé”™"));
+        QMessageBox box(QMessageBox::Warning, tr("Error"), tr("¶ÁÈ¡replayÎÄ¼þ³ö´í"));
         box.exec();
 
         isRunning = false;
@@ -190,12 +209,9 @@ void robotPlayerMainWindow::openButtonClicked()
                                                 log.at(i).MoveDir == LogEntry::S ? "S":
                                                     log.at(i).MoveDir == LogEntry::W ? "W":"N"));
         historyLogTable->setItem(i, 2, temp);
-
-        //temp = new QTableWidgetItem(QString(log.at(i).UserData.c_str()));
-        //historyLogTable->setItem(i, 3, temp);
     }
 
-    //é«˜äº®æ˜¾ç¤ºç¬¬0è¡Œ
+    //¸ßÁÁÏÔÊ¾µÚ0ÐÐ
     for(int i = 0; i < 3; i ++){
         historyLogTable->item(0, i)->setBackground(QBrush(Qt::green));
     }
@@ -203,7 +219,7 @@ void robotPlayerMainWindow::openButtonClicked()
     //set the map browser
     mapWidget->setMap(robotMap->GetMap());
     cout << "robot original place:" << log.at(0).Pos.x << " " << log.at(0).Pos.y << endl;
-    mapWidget->setRobotPlace(log.at(0).Pos.y, log.at(0).Pos.x);//è¿™é‡ŒPos.xè¡¨ç¤ºè¡Œï¼ŒPos.yè¡¨ç¤ºåˆ—(ä»¥0ä¸ºå¼€å§‹)
+    mapWidget->setRobotPlace(log.at(0).Pos.y, log.at(0).Pos.x);//ÕâÀïPos.x±íÊ¾ÐÐ£¬Pos.y±íÊ¾ÁÐ(ÒÔ0Îª¿ªÊ¼)
 
     playOrPause->setEnabled(true);
     reset->setEnabled(true);
@@ -290,7 +306,6 @@ void robotPlayerMainWindow::robotOperation(int op)
     curStep = robotMap->GetStep();
     for(int i = 0; i < 3; i ++){
         historyLogTable->item(curStep, i)->setBackground(QBrush(Qt::white));
-        //historyLogTable->item(curStep, i)->setTextColor(Qt::black);
     }
     switch(op){
     case 0:
@@ -308,15 +323,10 @@ void robotPlayerMainWindow::robotOperation(int op)
     default:
         ;//do nothing
     }
-    //int selectedRow = historyLogTable->currentRow();
     curStep = robotMap->GetStep();
-    //QModelIndex index = historyLogTable->model()->index(curStep, 0);//indexFromItem(historyLogTable->item(curStep, 0));
-    //historyLogTable->setCurrentIndex(index);
-    //cout << "Current indexed row:" << index.row() << endl;
     historyLogTable->selectRow(curStep);
     for(int i = 0; i < 3; i ++){
         historyLogTable->item(curStep, i)->setBackground(QBrush(Qt::green));
-        //historyLogTable->item(curStep, i)->setTextColor(Qt::blue);
     }
     historyLogTable->setFocus();
     mapWidget->setMap(robotMap->GetMap());

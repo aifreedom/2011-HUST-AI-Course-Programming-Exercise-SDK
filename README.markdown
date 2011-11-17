@@ -8,6 +8,8 @@
 2. Compile robot.cpp
 3. Run command
 
-    runrobot.py robot.exe map.txt 2
+```
+runrobot.py robot.exe map.txt 2
+```
 
 4. Use robotPlayer to load RobotReplay_XXXX.log

@@ -1,30 +1,42 @@
+// Huazhong University of Science and Technology
+// 2011 AI Course Programming Exercise SDK - RobotPlayer
+// Author: Jian Gong<gongjian1990@gmail.com> Song Xie<mail@xiesong.me>
+// Date: November 10, 2011
+//
+// This file is part of HUST AI Course Programming Exercise SKD.
+//
+// HUST AI Course Programming Exercise SKD is free software: you can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either
+// version 3 of the License, or (at your option) any later version.
+// HUST AI Course Programming Exercise SKD is distributed in the hope
+// that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+// PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with HUST AI Course Programming Exercise SKD. If not, see
+// <http://www.gnu.org/licenses/>.
+
 #include <iostream>
 #include <cstdio>
 #include "map.hpp"
 using namespace std;
 
-//const int bufSize = 10000;
-
 Map::Map(string filename)
 {
      FILE* logFile = fopen(filename.c_str(), "r");
      curStep = 0;
-     // fprintf(stderr, "before load map\n");
      if (!LoadMap(logFile))
      {
           fprintf(stderr, "wrong map\n");
-          // TODO: throws an exception for wrong format of log file
           throw exception();
      }
-     // fprintf(stderr, "after load map\n");
-     // fprintf(stderr, "before load step\n");
      if (!LoadSteps(logFile))
      {
           fprintf(stderr, "wrong log\n");
-          // TODO: throws an exception for wrong format of log file
           throw exception();
      }
-     // fprintf(stderr, "after load step\n");
      fclose(logFile);
 }
 
@@ -33,8 +45,8 @@ Map::Map(string filename)
 bool Map::LoadMap(FILE* logFile)
 {
      int n, m; // height and width of the map
-     
-     if (fscanf(logFile, "%d%d", &n, &m) != 2) 
+
+     if (fscanf(logFile, "%d%d", &n, &m) != 2)
      {
           // map size wrong format
           return false;
@@ -48,14 +60,14 @@ bool Map::LoadMap(FILE* logFile)
      // the upper-left corner of the map is (1, 1)
      startPos.x--;
      startPos.y--;
-     
+
      GetLinefeed(logFile);
 
      if (n < 0 || m < 0)
      {
           return false;
      }
-     
+
      for (int i=0; i<n; i++)
      {
           char ch;
@@ -104,16 +116,14 @@ bool Map::LoadSteps(FILE* logFile)
 {
      int stepCount; // total steps
      Point pos = startPos;
-     //char userData[bufSize];
      char dir;
-     
+
      if (fscanf(logFile, "%d", &stepCount) != 1)
      {
-          // TODO: throws an exception for wrong format of log file
           throw exception();
      }
      GetLinefeed(logFile);
-     
+
      for (int i=0; i<stepCount; i++)
      {
           LogEntry step;
@@ -141,9 +151,6 @@ bool Map::LoadSteps(FILE* logFile)
                // wrong format
                return false;
           }
-          //GetLinefeed(logFile);
-          //fgets(userData, bufSize, logFile);
-          //step.UserData = userData;
           stepList.push_back(step);
      }
      return true;
@@ -282,7 +289,6 @@ void Map::GetLinefeed(FILE* logFile)
      if (ch != '\n')
      {
           // if not '\n', the format is wrong
-          // TODO: throws an exception
           throw exception();
      }
 }

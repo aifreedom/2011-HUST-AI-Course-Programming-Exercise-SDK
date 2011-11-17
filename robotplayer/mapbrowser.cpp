@@ -1,3 +1,23 @@
+// Huazhong University of Science and Technology
+// 2011 AI Course Programming Exercise SDK - RobotPlayer
+// Author: Jian Gong<gongjian1990@gmail.com> Song Xie<mail@xiesong.me>
+// Date: November 10, 2011
+//
+// This file is part of HUST AI Course Programming Exercise SKD.
+//
+// HUST AI Course Programming Exercise SKD is free software: you can
+// redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either
+// version 3 of the License, or (at your option) any later version.
+// HUST AI Course Programming Exercise SKD is distributed in the hope
+// that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+// PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with HUST AI Course Programming Exercise SKD. If not, see
+// <http://www.gnu.org/licenses/>.
+
 #include "mapbrowser.h"
 
 mapBrowser::mapBrowser(QWidget *parent) :
@@ -18,7 +38,7 @@ QSize mapBrowser::sizeHint()const
         return QSize(draw_sizex, draw_sizey);
 }
 
-int mapBrowser::setMap(vector<vector<int> > mapInput)//(int rowNum, int columnNum, char map[max_w][max_h])
+int mapBrowser::setMap(vector<vector<int> > mapInput)
 {
     map = mapInput;
     repaint();
@@ -68,31 +88,20 @@ void mapBrowser::paintEvent(QPaintEvent *)
         }
         rect_x = draw_x / columnNum;
         rect_y = draw_y / rowNum;
-/*
-        cout << endl;
-        for(int i = 0; i < rowNum; i++){
-            for(int j = 0; j < columnNum; j++){
-                cout << map.at(i).at(j) << '\t';
-            }
-            cout << endl;
-        }
-*/
+
         for(int i = 0; i < rowNum; i++){
             for(int j = 0; j < columnNum; j++){
                 if(map.at(i).at(j) == -2){
                     painter.setBrush(Qt::black);
                     painter.drawRect(start_x + rect_x*j, start_y + rect_y*i,
-                                     start_x + rect_x*j + rect_x - 2, start_y + rect_y*i + rect_y - 2);
+                                     rect_x - 2, rect_y - 2);
                 }
                 else{
                     painter.setBrush(Qt::yellow);
                     painter.drawRect(start_x + rect_x*j, start_y + rect_y*i,
-                                     start_x + rect_x*j + rect_x - 2, start_y + rect_y*i + rect_y - 2);
+                                     rect_x - 2, rect_y - 2);
                     if(map.at(i).at(j) != -1){
-                        // painter.setBrush(Qt::black);
                         painter.setPen(Qt::black);
-                        //cout << start_x + rect_x*j + rect_x - 2<< start_y + rect_y*i + rect_y - 2 << endl;
-                        //cout << map.at(i).at(j) << endl;
                         painter.drawText(start_x + rect_x*j + rect_x/2, start_y + rect_y*i + rect_y/2,
                                          QString::number(map.at(i).at(j)));
                         painter.setPen(Qt::white);
@@ -102,11 +111,14 @@ void mapBrowser::paintEvent(QPaintEvent *)
         }
         painter.drawPixmap(start_x + rect_x*robot_x, start_y + rect_y*robot_y, rect_x, rect_y, *robot);
         painter.setBrush(Qt::gray);
+        painter.setPen(Qt::gray);
         if(columnNum*4 >= rowNum*6){
             painter.drawRect(0, draw_sizey - start_y, draw_sizex, start_y);
+            painter.drawRect(0, 0, draw_sizex, start_y);
         }
         else{
             painter.drawRect(draw_sizex - start_x, 0, start_x, draw_sizey);
+            painter.drawRect(0, 0, start_x, draw_sizey);
         }
     }
 }
