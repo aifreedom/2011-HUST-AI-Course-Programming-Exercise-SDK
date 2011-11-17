@@ -118,6 +118,8 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
         elif output == 'E':
             newx = x
             newy = y + 1
+        elif output == '$':
+            break
         else:
             print 'runrobot: Error! "%s" is not a valid move direction.' % output
             raise ValueError
@@ -139,13 +141,14 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
         
         stepList.append(output)
 
-
     replay = open(replayFileName, 'w')
     PrintMap(replay, m, startP)
     replay.write('%d\n' % totalStep)
     replay.write(''.join(stepList) + '\n')
     replay.close()
-    p.kill()
+    returnCode = p.poll()
+    if returnCode:
+        p.kill()
 # end of RunRobot
     
 def Run(robot, mapfile, step):
