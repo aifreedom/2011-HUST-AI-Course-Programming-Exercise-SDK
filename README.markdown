@@ -5,7 +5,7 @@
 ------------
 
 1. Intall [Python](http://python.org/)
-2. Compile robot.cpp
+2. Compile robot.c
 3. Run command
 
 ```

@@ -135,7 +135,11 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
             errorLog.write('Pos: (%d, %d)\n' % (x+1, y+1))
             errorLog.write(output+'\n')
             errorLog.close()
-            p.kill()
+            returnCode = p.poll()
+            if returnCode == 0:
+                p.wait()
+            else:
+                p.kill()
             print 'runrobot: Error! Your robot moves into an obstacle. Please check the error log %s.' % errorLogFileName
             raise ValueError
         
@@ -147,7 +151,9 @@ def RunRobot(robot, m, startP, totalStep, currentTime):
     replay.write(''.join(stepList) + '\n')
     replay.close()
     returnCode = p.poll()
-    if returnCode:
+    if returnCode == 0:
+        p.wait()
+    else:
         p.kill()
 # end of RunRobot
     
